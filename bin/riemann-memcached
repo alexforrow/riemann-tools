@@ -3,9 +3,11 @@
 # Gathers memcached STATS and submits them to Riemann.
 
 require File.expand_path('../../lib/riemann/tools', __FILE__)
+require File.expand_path('../../lib/riemann/tools/process', __FILE__)
 
 class Riemann::Tools::Memcached
   include Riemann::Tools
+  include Riemann::Tools::Process
   require 'socket'
 
   opt :memcached_host, "Memcached hostname", :default => 'localhost'
@@ -31,6 +33,9 @@ class Riemann::Tools::Memcached
              )
     end
     sock.close
+
+    # Process metrics
+    report_process "memcached", ["memcached"]
   end
 end
 

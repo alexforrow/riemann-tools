@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+# Checks process and http healthcheck and reports to riemann.
+
+require File.expand_path('../../lib/riemann/tools', __FILE__)
+require File.expand_path('../../lib/riemann/tools/process', __FILE__)
+require File.expand_path('../../lib/riemann/tools/http', __FILE__)
+
+class Riemann::Tools::Application
+  include Riemann::Tools
+  include Riemann::Tools::Process
+  include Riemann::Tools::Http
+
+  opt :service, "Name of the service", :required => true, :type => :string
+
+  def tick
+    # Run process reports, if successful run http checks also
+    if report_process opts[:service]
+      report_http_healthcheck opts[:service]
+    end
+  end
+end
+
+Riemann::Tools::Application.run
