@@ -24,7 +24,11 @@ module Riemann
       end
 
       def get_process_status
-        return nil unless (pid = get_pid)
+        begin
+          return nil unless (pid = get_pid)
+        rescue
+          return false
+        end
         return File.exists?("/proc/#{pid}")
       end
 
@@ -32,7 +36,16 @@ module Riemann
         # TODO - add whitelist?
 
         # Do nothing if we don't have a pid
-        return nil unless (pid = get_pid) 
+        begin
+          return nil unless (pid = get_pid) 
+        rescue Exception => e
+          report(
+            :service => "#{service} process",
+            :state => 'failure',
+            :description => "Error getting pid: #{e.message}",
+            :tags => tags
+          )
+        end
 
         report(
           :service => "#{service} process",
