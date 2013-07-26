@@ -54,9 +54,8 @@ module Riemann
     end
 
     def report(event)
-      if options[:tag]
-        event[:tags] = options[:tag]
-      end
+       # Merge tags from cmd line and code
+      event[:tags] = options[:tag] + (event[:tags] || Array.new)
 
       if options[:ttl]
         event[:ttl] = options[:ttl]
